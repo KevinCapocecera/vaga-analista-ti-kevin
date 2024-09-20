@@ -5,4 +5,4 @@ Por exemplo questões 1 e 2 onde temos funcionarios, projetos, atribuicao etc.
 Banco de Dados Não-Relacional possuem uma estrutura um pouco diferente do SQL ele armazena os dados de forma mais flexivel, sem a necessidade de relacionar diferentes entidades.
 
 Um cenário onde eu utilizaria um banco de dados NoSQL seria uma ferramenta que analisa o sentimento das postagens em redes sociais em tempo real (se são positivas, negativas ou neutras)
-iria armazenar os resultados da analise sendo eles: postagem, autor e sentimento. Me permitindo armazenar diferentes tipos de dados dentro do meu BD.
+iria armazenar os resultados da analise sendo eles: postagem, autor e sentimento. Me permitindo armazenar diferentes tipos de dados dentro do meu BD. Os benefícios ao utilizar o banco de dados NoSQL seria processar um grande volume de Dados.
