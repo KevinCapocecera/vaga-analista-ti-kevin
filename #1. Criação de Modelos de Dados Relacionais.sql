@@ -6,7 +6,7 @@ USE gerenciamento_projetos;
 
 -- Cria a tabela 'funcionarios' com colunas para ID, nome, cargo e departamento
 CREATE TABLE funcionarios (
-    ID INT PRIMARY KEY AUTO_INCREMENT, -- Coluna 'ID' é a chave primária e autoincrementa automaticamente
+    ID INT PRIMARY KEY AUTO_INCREMENT, -- Coluna 'ID' é a chave primária e incrementa automaticamente
     nome VARCHAR(100) NOT NULL,        -- Nome do funcionário, não pode ser nulo
     cargo VARCHAR(50) NOT NULL,        -- Cargo do funcionário, não pode ser nulo
     departamento VARCHAR(50)           -- Departamento do funcionário (opcional)
@@ -14,7 +14,7 @@ CREATE TABLE funcionarios (
 
 -- Cria a tabela 'projeto' com colunas para ID, nome do projeto, data de início e data de fim
 CREATE TABLE projeto (
-    ID INT PRIMARY KEY AUTO_INCREMENT,    -- Coluna 'ID' é a chave primária e autoincrementa automaticamente
+    ID INT PRIMARY KEY AUTO_INCREMENT,    -- Coluna 'ID' é a chave primária e incrementa automaticamente
     nome_do_projeto VARCHAR(100) NOT NULL, -- Nome do projeto, não pode ser nulo
     data_inicio DATE,                    -- Data de início do projeto
     data_fim DATE                        -- Data de fim do projeto
