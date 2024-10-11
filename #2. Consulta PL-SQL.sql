@@ -1,60 +1,98 @@
--- Criação da tabela 'funcionarios' para armazenar dados dos funcionários
-create table funcionarios (
-	ID int primary key auto_increment,  -- ID do funcionário, chave primária que auto incrementa
-	nome varchar(100) not null,        -- Nome do funcionário, campo obrigatório
-    salario decimal (10, 2)             -- Salário do funcionário, formato decimal com até 10 dígitos, 2 casas decimais
+CREATE DATABASE gerenciador_projetos;
+
+USE gerenciador_projetos;
+
+CREATE TABLE funcionario( 
+	ID INT PRIMARY KEY AUTO_INCREMENT,
+    NOME VARCHAR(40) NOT NULL,
+    CARGO VARCHAR(40) NOT NULL,
+    DEPARTAMENTO VARCHAR(60) NOT NULL
 );
 
--- Criação da tabela 'projetos' para armazenar informações sobre os projetos
-create table projetos (
-	ID int primary key auto_increment,  -- ID do projeto, chave primária que auto incrementa
-    nome varchar(100) not null          -- Nome do projeto, campo obrigatório
-);
+SELECT * FROM funcionario;
 
--- Criação da tabela 'horas_trabalhadas' para registrar as horas que cada funcionário trabalhou em projetos
-create table horas_trabalhadas (
-	funcionarioID int,                  -- ID do funcionário, referência à tabela 'funcionarios'
-    projetoID int,                      -- ID do projeto, referência à tabela 'projetos'
-    horas decimal (5, 2) default 0,    -- Horas trabalhadas, formato decimal com 2 casas decimais, padrão é 0
-    foreign key (funcionarioID) references funcionarios(ID),  -- Chave estrangeira para 'funcionarios'
-    foreign key (projetoID) references projetos(ID)           -- Chave estrangeira para 'projetos'
-);
+INSERT INTO funcionario(NOME, CARGO, DEPARTAMENTO)
+	VALUES("Kevin", "Analista de Dados", "TI");
+INSERT INTO funcionario (NOME, CARGO, DEPARTAMENTO)
+  VALUES ('Maria', 'Desenvolvedora Back-End', 'TI');
 
--- Exibe todos os registros da tabela 'horas_trabalhadas'
-select * from horas_trabalhadas;
+INSERT INTO funcionario (NOME, CARGO, DEPARTAMENTO)
+  VALUES ('João', 'Engenheiro de Redes', 'Infraestrutura');
 
--- Exibe todos os registros da tabela 'projetos'
-select * from projetos;
+INSERT INTO funcionario (NOME, CARGO, DEPARTAMENTO)
+  VALUES ('Ana', 'Analista de Sistemas', 'TI');
 
--- Exibe todos os registros da tabela 'funcionarios'
-select * from funcionarios;
+INSERT INTO funcionario (NOME, CARGO, DEPARTAMENTO)
+  VALUES ('Pedro', 'Gestor de Projetos', 'Gerência');
+DELETE 
+	FROM funcionario 
+WHERE ID ;
 
--- Insere um novo funcionário na tabela 'funcionarios'
-insert into funcionarios (nome, salario)
-values ('kaique', 2.500);  -- Nome: Kaique, Salário: 2500.00
+CREATE TABLE projeto( 
+	ID INT PRIMARY KEY AUTO_INCREMENT,
+    NOME_PROJETO VARCHAR(60) NOT NULL,
+    DATA_INICIO DATE NOT NULL,
+    DATA_FIM DATE NOT NULL    
+);    
+SELECT * FROM projeto;
 
--- Insere novos projetos na tabela 'projetos'
-insert into projetos (nome)
-values ('Desenvolvimento Backend'),   -- Primeiro projeto
-		('Desenvolvimento Frontend');   -- Segundo projeto
-
--- Insere horas trabalhadas por um funcionário em diferentes projetos
-insert into horas_trabalhadas (funcionarioID, projetoID, horas)
-values (2, 1, 10),  -- Funcionário 2 trabalhou 10 horas no projeto 1
-	(2, 2, 20);     -- Funcionário 2 trabalhou 20 horas no projeto 2
+INSERT INTO projeto (NOME_PROJETO, DATA_INICIO, DATA_FIM)
+	VALUES ("desenvolvimento back-end", '2024-10-24', '2024-10-28');
     
--- Consulta para obter o nome do funcionário, os projetos em que trabalhou e o total de horas
-SELECT
-    f.Nome AS Nome_Funcionario,                              -- Seleciona o nome do funcionário
-    GROUP_CONCAT(p.Nome SEPARATOR '/ ') AS Projetos_Envolvidos,  -- Concatena os nomes dos projetos
-    SUM(h.Horas) AS Total_Horas_Trabalhadas                  -- Soma total de horas trabalhadas
-FROM
-    horas_trabalhadas h                                       -- Tabela de horas trabalhadas
-INNER JOIN
-    funcionarios f ON h.funcionarioID = f.ID                -- Junta com a tabela de funcionários
-INNER JOIN
-    projetos p ON h.projetoID = p.ID                         -- Junta com a tabela de projetos
-WHERE
-    f.id = 1                                                  -- Filtra apenas pelo funcionário com ID 1
-GROUP BY
-    f.id;                                                    -- Agrupa os resultados pelo ID do funcionário
+CREATE TABLE atribuicao (
+	id_funcionario INT,
+    id_projeto INT,
+    horas_trab DECIMAL(5, 2) DEFAULT 0,
+    FOREIGN KEY (id_funcionario) REFERENCES funcionario(ID),
+    FOREIGN KEY (id_projeto) REFERENCES projeto(ID)
+);
+
+ALTER TABLE atribuicao
+ADD horas_trab DOUBLE;
+
+SELECT * FROM atribuicao;
+
+INSERT INTO atribuicao(id_funcionario, id_projeto, horas_trab)
+	VALUES(7, 4, 18.00);
+
+DROP TABLE atribuicao;
+
+
+DELIMITER //
+
+CREATE PROCEDURE ObterInfoFuncionario(IN p_id_funcionario INT)
+BEGIN
+    DECLARE v_nome_funcionario VARCHAR(40);
+    DECLARE v_horas_trabalhadas DECIMAL(10, 2);
+
+    -- Obter o nome do funcionário
+    SELECT NOME INTO v_nome_funcionario
+    FROM funcionario
+    WHERE ID = p_id_funcionario;
+
+    -- Verificar se o funcionário existe
+    IF v_nome_funcionario IS NULL THEN
+        SELECT 'Funcionário não encontrado' AS Mensagem;
+    END IF;
+
+    -- Obter a soma total de horas trabalhadas
+    SELECT SUM(horas_trab) INTO v_horas_trabalhadas
+    FROM atribuicao
+    WHERE id_funcionario = p_id_funcionario;
+
+    -- Exibir o nome do funcionário
+    SELECT v_nome_funcionario AS Nome, 
+           GROUP_CONCAT(p.NOME_PROJETO SEPARATOR ', ') AS Projetos,
+           IFNULL(v_horas_trabalhadas, 0) AS Total_Horas_Trabalhadas
+    FROM atribuicao a
+    JOIN projeto p ON a.id_projeto = p.ID
+    WHERE a.id_funcionario = p_id_funcionario
+    GROUP BY v_nome_funcionario;
+
+END //
+
+DELIMITER ;
+
+CALL ObterInfoFuncionario(07);
+
+commit;
